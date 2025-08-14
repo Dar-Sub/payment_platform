@@ -1,0 +1,27 @@
+{
+  "name": "payment-platform",
+  "version": "1.0.0",
+  "description": "A modern payment platform built with React, Node.js, and Paystack APIs",
+  "main": "index.js",
+  "scripts": {
+    "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm start",
+    "build": "cd frontend && npm run build",
+    "start": "cd backend && npm start"
+  },
+  "keywords": [
+    "paystack",
+    "payment",
+    "react",
+    "nodejs",
+    "express",
+    "typescript"
+  ],
+  "author": "Technical Support Specialist",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}

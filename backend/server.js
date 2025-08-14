@@ -1,0 +1,98 @@
+const express = require('express');
+const cors = require('cors');
+const axios = require('axios');
+require('dotenv').config();
+
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// Paystack configuration
+const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY || 'sk_test_...'; // Replace with your test key
+const PAYSTACK_BASE_URL = 'https://api.paystack.co';
+
+// Initialize Payment
+app.post('/api/initialize-payment', async (req, res) => {
+  try {
+    const { email, amount, reference } = req.body;
+    
+    const response = await axios.post(
+      `${PAYSTACK_BASE_URL}/transaction/initialize`,
+      {
+        email,
+        amount: amount * 100, // Convert to kobo (smallest currency unit)
+        reference,
+        currency: 'NGN', // Specify Nigerian Naira currency
+        callback_url: `${req.protocol}://${req.get('host')}/api/verify-payment`,
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${PAYSTACK_SECRET_KEY}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    res.json({
+      success: true,
+      data: response.data.data,
+    });
+  } catch (error) {
+    console.error('Payment initialization error:', error.response?.data || error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to initialize payment',
+      error: error.response?.data || error.message,
+    });
+  }
+});
+
+// Verify Payment
+app.post('/api/verify-payment', async (req, res) => {
+  try {
+    const { reference } = req.body;
+    
+    const response = await axios.get(
+      `${PAYSTACK_BASE_URL}/transaction/verify/${reference}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${PAYSTACK_SECRET_KEY}`,
+        },
+      }
+    );
+
+    const transaction = response.data.data;
+    
+    res.json({
+      success: true,
+      data: {
+        status: transaction.status,
+        amount: transaction.amount / 100, // Convert from kobo to naira
+        reference: transaction.reference,
+        gateway_response: transaction.gateway_response,
+        paid_at: transaction.paid_at,
+        customer: transaction.customer,
+      },
+    });
+  } catch (error) {
+    console.error('Payment verification error:', error.response?.data || error.message);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to verify payment',
+      error: error.response?.data || error.message,
+    });
+  }
+});
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'OK', message: 'Payment API is running' });
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Health check: http://localhost:${PORT}/api/health`);
+});
