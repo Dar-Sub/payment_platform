@@ -7,30 +7,35 @@ A modern payment platform built with React, Node.js, and Paystack APIs. This pro
 - **Payment Initialization**: Create payment transactions using Paystack's Initialize Transaction API
 - **Payment Verification**: Verify payment status using Paystack's Verify Transaction API
 - **Modern UI**: Beautiful, responsive interface built with React and Tailwind CSS
-- **TypeScript**: Full TypeScript support for better development experience
+- **Professional Design**: Sophisticated dark theme with glass morphism effects
 - **Real-time Status**: Live payment status updates and verification results
+- **Single-page Experience**: Compact design that fits on one screen
 
 ## Tech Stack
 
 ### Frontend
-- React 18 with TypeScript
+- React 18 with JavaScript
 - Tailwind CSS for styling
 - Axios for API communication
+- Professional dark theme with animations
 
 ### Backend
 - Node.js with Express
 - Paystack API integration
 - CORS enabled for cross-origin requests
+- Environment variable management
 
 ## APIs Implemented
 
 1. **Initialize Transaction API** (`POST /api/initialize-payment`)
    - Creates a new payment transaction
    - Returns authorization URL for payment completion
+   - Supports NGN currency with proper validation
 
 2. **Verify Transaction API** (`POST /api/verify-payment`)
    - Verifies payment status using transaction reference
    - Returns detailed transaction information
+   - Handles kobo to naira conversion
 
 ## Quick Start
 
@@ -43,27 +48,29 @@ A modern payment platform built with React, Node.js, and Paystack APIs. This pro
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd payment-platform
+   git clone https://github.com/Dar-Sub/payment_platform.git
+   cd payment_platform
    ```
 
-2. **Setup Backend**
+2. **Install all dependencies**
+   ```bash
+   npm run install-all
+   ```
+
+3. **Setup Environment Variables**
    ```bash
    cd backend
-   npm install
    cp env.example .env
    # Edit .env and add your Paystack secret key
+   ```
+
+4. **Start the application**
+   ```bash
+   # Start both frontend and backend
    npm run dev
    ```
 
-3. **Setup Frontend**
-   ```bash
-   cd ../frontend
-   npm install
-   npm start
-   ```
-
-4. **Access the application**
+5. **Access the application**
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:5000
 
@@ -94,9 +101,9 @@ PORT=5000
 
 For testing purposes, use these Paystack test cards:
 
-- **Visa**: 4084 0840 8408 4081
-- **Mastercard**: 5105 1051 0510 5100
-- **Verve**: 5061 0000 0000 0000
+- **Card Number**: 4084 0840 8408 4081
+- **CVV**: 408
+- **Expiry**: 01/25 (or any future date)
 
 ## API Endpoints
 
@@ -128,28 +135,33 @@ POST /api/verify-payment
 
 ## Deployment
 
-### Vercel Deployment
+### Vercel Deployment (Recommended)
 
-1. **Deploy Backend**
+The project includes `vercel.json` configuration for easy deployment:
+
+1. **Connect to Vercel**
    ```bash
-   cd backend
+   npm install -g vercel
+   vercel login
+   ```
+
+2. **Deploy**
+   ```bash
    vercel --prod
    ```
 
-2. **Deploy Frontend**
-   ```bash
-   cd frontend
-   vercel --prod
-   ```
+3. **Set Environment Variables**
+   - Add `PAYSTACK_SECRET_KEY` in Vercel dashboard
 
-3. **Update Environment Variables**
-   - Set `REACT_APP_API_URL` in frontend environment
-   - Set `PAYSTACK_SECRET_KEY` in backend environment
+### Alternative Deployment Options
+
+- **Netlify**: Frontend deployment with API proxy
+- **Heroku**: Full-stack deployment with Procfile
 
 ## Project Structure
 
 ```
-payment-platform/
+payment_platform/
 ├── backend/
 │   ├── server.js          # Express server with Paystack integration
 │   ├── package.json       # Backend dependencies
@@ -157,12 +169,14 @@ payment-platform/
 ├── frontend/
 │   ├── src/
 │   │   ├── components/
-│   │   │   └── PaymentForm.tsx  # Main payment component
-│   │   ├── App.tsx        # Main app component
-│   │   └── index.css      # Tailwind CSS imports
+│   │   │   └── PaymentForm.js  # Main payment component
+│   │   ├── App.js         # Main app component
+│   │   └── index.css      # Tailwind CSS with animations
 │   ├── package.json       # Frontend dependencies
 │   └── tailwind.config.js # Tailwind configuration
-└── README.md              # Project documentation
+├── package.json           # Root package.json with scripts
+├── vercel.json           # Vercel deployment configuration
+└── README.md             # Project documentation
 ```
 
 ## Security Considerations
@@ -171,6 +185,7 @@ payment-platform/
 - CORS is properly configured
 - Input validation is implemented
 - Error handling for API failures
+- Secure payment processing with Paystack
 
 ## Contributing
 
