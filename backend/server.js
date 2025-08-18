@@ -16,13 +16,37 @@ app.use(cors({
 app.use(express.json());
 
 // Paystack configuration
-const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY || 'sk_test_...'; // Replace with your test key
+const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 const PAYSTACK_BASE_URL = 'https://api.paystack.co';
+
+// Debug: Log environment info (without exposing the actual key)
+console.log('Environment check:', {
+  NODE_ENV: process.env.NODE_ENV,
+  HAS_PAYSTACK_KEY: !!PAYSTACK_SECRET_KEY,
+  KEY_STARTS_WITH: PAYSTACK_SECRET_KEY ? PAYSTACK_SECRET_KEY.substring(0, 7) + '...' : 'NOT_SET'
+});
 
 // Initialize Payment
 app.post('/api/initialize-payment', async (req, res) => {
   try {
+    // Check if API key is available
+    if (!PAYSTACK_SECRET_KEY) {
+      console.error('PAYSTACK_SECRET_KEY is not set');
+      return res.status(500).json({
+        success: false,
+        message: 'Payment service configuration error',
+        error: 'API key not configured'
+      });
+    }
+
     const { email, amount, reference } = req.body;
+    
+    console.log('Initializing payment with:', {
+      email,
+      amount,
+      reference,
+      hasKey: !!PAYSTACK_SECRET_KEY
+    });
     
     const response = await axios.post(
       `${PAYSTACK_BASE_URL}/transaction/initialize`,
@@ -48,7 +72,11 @@ app.post('/api/initialize-payment', async (req, res) => {
       data: response.data.data,
     });
   } catch (error) {
-    console.error('Payment initialization error:', error.response?.data || error.message);
+    console.error('Payment initialization error:', {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status
+    });
     res.status(500).json({
       success: false,
       message: 'Failed to initialize payment',
