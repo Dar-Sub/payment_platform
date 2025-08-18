@@ -7,7 +7,12 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://payment-platform-two.vercel.app', 'https://*.vercel.app']
+    : ['http://localhost:3000'],
+  credentials: true
+}));
 app.use(express.json());
 
 // Paystack configuration
@@ -26,7 +31,9 @@ app.post('/api/initialize-payment', async (req, res) => {
         amount: amount * 100, // Convert to kobo (smallest currency unit)
         reference,
         currency: 'NGN', // Specify Nigerian Naira currency
-        callback_url: `${req.protocol}://${req.get('host')}/api/verify-payment`,
+        callback_url: process.env.NODE_ENV === 'production' 
+          ? 'https://payment-platform-two.vercel.app/api/verify-payment'
+          : `${req.protocol}://${req.get('host')}/api/verify-payment`,
       },
       {
         headers: {

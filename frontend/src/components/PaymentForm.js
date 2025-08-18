@@ -11,7 +11,8 @@ const PaymentForm = () => {
   const [paymentStatus, setPaymentStatus] = useState('');
   const [verificationResult, setVerificationResult] = useState(null);
 
-  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+  // Use relative URL for Vercel deployment (same domain for frontend and backend)
+  const API_BASE_URL = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:5000';
 
   const generateReference = () => {
     return `PAY-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
